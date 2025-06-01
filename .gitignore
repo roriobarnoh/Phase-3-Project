@@ -1,0 +1,51 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Virtual environment
+.venv/
+env/
+venv/
+
+# SQLite database
+*.sqlite3
+*.db
+
+# Alembic migration cache files
+alembic.ini
+*.pyc
+*.pyo
+
+# VS Code settings
+.vscode/
+
+# Pytest / coverage
+htmlcov/
+.coverage
+.tox/
+.cache/
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+
+# MacOS system files
+.DS_Store
+
+# Python egg metadata and distribution
+*.egg-info/
+dist/
+build/
+
+# Log files
+*.log
+
+# Environment variable files
+.env
+.env.*
+
+school.db
