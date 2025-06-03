@@ -1,4 +1,5 @@
 import re
+from tabulate import tabulate
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from lib.db.models import Teacher, Student, Classroom
@@ -16,9 +17,11 @@ def list_teachers():
     if not teachers:
         print("No teachers found.")
         return
-    print("\nTeachers:")
-    for t in teachers:
-        print(f"ID: {t.id}, Name: {t.name}, Subject: {t.subject}, Email: {t.email}")
+
+    table = [[t.id, t.name, t.subject, t.email] for t in teachers]
+    print("\n👩‍🏫 All Teachers:")
+    print(tabulate(table, headers=["ID", "Name", "Subject", "Email"], tablefmt="fancy_grid"))
+
 
 def add_teacher():
     name = input("Enter teacher's name: ").strip()
@@ -83,9 +86,19 @@ def list_students():
     if not students:
         print("No students found.")
         return
+
+    table = []
     for s in students:
-        teacher_name = s.teacher.name if s.teacher else "No teacher assigned"
-        print(f"ID: {s.id}, Name: {s.name}, Grade: {s.grade}, Teacher: {teacher_name}")
+        table.append([
+            s.id,
+            s.name,
+            s.grade,
+            s.classroom.name if s.classroom else "N/A",
+            s.classroom.teacher.name if s.classroom and s.classroom.teacher else "N/A"
+        ])
+
+    print("\n👨‍🎓 All Students:")
+    print(tabulate(table, headers=["ID", "Name", "Grade", "Classroom", "Teacher"], tablefmt="fancy_grid"))
 
 def add_student():
     name = input("Enter student's name: ").strip()
@@ -162,9 +175,15 @@ def list_classrooms():
     if not classrooms:
         print("No classrooms found.")
         return
+
+    table = []
     for c in classrooms:
-        teacher = session.query(Teacher).filter_by(id=c.teacher_id).first()
-        print(f"ID: {c.id}, Name: {c.name}, Teacher: {teacher.name if teacher else 'None'}")
+        teacher_name = c.teacher.name if c.teacher else "N/A"
+        num_students = len(c.students) if hasattr(c, 'students') else "?"
+        table.append([c.id, c.name, teacher_name, num_students])
+
+    print("\n🏫 All Classrooms:")
+    print(tabulate(table, headers=["ID", "Name", "Teacher", "No. of Students"], tablefmt="fancy_grid"))
 
 def add_classroom():
     name = input("Enter classroom name: ").strip()

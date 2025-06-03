@@ -1,13 +1,14 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from lib.db.models import Base, Teacher, Student, Classroom
+from tabulate import tabulate
 
 # Initialize DB
 engine = create_engine("sqlite:///lib/db/school.db")
 Session = sessionmaker(bind=engine)
 session = Session()
 
-# Clear existing data (optional for reseeding)
+# Clear existing data
 session.query(Student).delete()
 session.query(Classroom).delete()
 session.query(Teacher).delete()
@@ -24,7 +25,7 @@ teachers = [
 session.add_all(teachers)
 session.commit()
 
-# Seed Classrooms (1 classroom per teacher, total 3 classrooms only for now)
+# Seed Classrooms
 classrooms = [
     Classroom(name="Room A", teacher=teachers[0]),
     Classroom(name="Room B", teacher=teachers[1]),
@@ -49,4 +50,24 @@ students = [
 session.add_all(students)
 session.commit()
 
-print("✅ Seed data inserted successfully.")
+print("✅ Seed data inserted successfully.\n")
+
+# Tabular summary
+def print_summary():
+    print("👩‍🏫 Teachers:")
+    teacher_data = [[t.id, t.name, t.subject, t.email] for t in session.query(Teacher).all()]
+    print(tabulate(teacher_data, headers=["ID", "Name", "Subject", "Email"], tablefmt="fancy_grid"))
+
+    print("\n🏫 Classrooms:")
+    classroom_data = [[c.id, c.name, c.teacher.name if c.teacher else "N/A"] for c in session.query(Classroom).all()]
+    print(tabulate(classroom_data, headers=["ID", "Name", "Teacher"], tablefmt="fancy_grid"))
+
+    print("\n👨‍🎓 Students:")
+    student_data = [
+        [s.id, s.name, s.grade, s.classroom.name if s.classroom else "N/A"]
+        for s in session.query(Student).all()
+    ]
+    print(tabulate(student_data, headers=["ID", "Name", "Grade", "Classroom"], tablefmt="fancy_grid"))
+
+print_summary()
+
